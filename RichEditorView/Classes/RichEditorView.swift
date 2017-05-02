@@ -459,7 +459,7 @@ open class RichEditorView: UIView, UIScrollViewDelegate, UIWebViewDelegate, UIGe
     /// Scrolls the editor to a position where the caret is visible.
     /// Called repeatedly to make sure the caret is always visible when inputting text.
     /// Works only if the `lineHeight` of the editor is available.
-    private func scrollCaretToVisible() {
+    private func scrollCaretToVisible(animated: Bool) {
         let scrollView = self.webView.scrollView
         
         let contentHeight = clientHeight > 0 ? CGFloat(clientHeight) : scrollView.frame.height
@@ -484,7 +484,7 @@ open class RichEditorView: UIView, UIScrollViewDelegate, UIWebViewDelegate, UIGe
         }
 
         if let offset = offset {
-            scrollView.setContentOffset(offset, animated: true)
+            scrollView.setContentOffset(offset, animated: animated)
         }
     }
     
@@ -505,7 +505,7 @@ open class RichEditorView: UIView, UIScrollViewDelegate, UIWebViewDelegate, UIGe
             updateHeight()
         }
         else if method.hasPrefix("input") {
-            scrollCaretToVisible()
+            scrollCaretToVisible(animated: true)
             let content = runJS("RE.getHtml()")
             contentHTML = content
             updateHeight()
@@ -514,6 +514,7 @@ open class RichEditorView: UIView, UIScrollViewDelegate, UIWebViewDelegate, UIGe
             updateHeight()
         }
         else if method.hasPrefix("focus") {
+            scrollCaretToVisible(animated: false)
             delegate?.richEditorTookFocus?(self)
         }
         else if method.hasPrefix("blur") {
