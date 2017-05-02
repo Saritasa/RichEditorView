@@ -83,21 +83,31 @@ open class RichEditorView: UIView, UIScrollViewDelegate, UIWebViewDelegate, UIGe
         }
     }
 
-    /// The value we hold in order to be able to set the line height before the JS completely loads.
+    /// The private propety of `fontSize`.
+    private var innerFontSize: Int = 16
+
+    /// The font size of the editor. Defaults to 16.
+    open var fontSize: Int {
+        set {
+            innerFontSize = newValue
+            runJS("RE.setFontSize('\(innerFontSize)px');")
+        }
+        get {
+            return innerFontSize
+        }
+    }
+
+    /// The private property of `lineHeight`.
     private var innerLineHeight: Int = 28
 
     /// The line height of the editor. Defaults to 28.
-    open private(set) var lineHeight: Int {
-        get {
-            if isEditorLoaded, let lineHeight = Int(runJS("RE.getLineHeight();")) {
-                return lineHeight
-            } else {
-                return innerLineHeight
-            }
-        }
+    open var lineHeight: Int {
         set {
             innerLineHeight = newValue
             runJS("RE.setLineHeight('\(innerLineHeight)px');")
+        }
+        get {
+            return innerLineHeight
         }
     }
 
@@ -227,10 +237,6 @@ open class RichEditorView: UIView, UIScrollViewDelegate, UIWebViewDelegate, UIGe
 
     public func removeFormat() {
         runJS("RE.removeFormat();")
-    }
-    
-    public func setFontSize(_ size: Int) {
-        runJS("RE.setFontSize('\(size)px');")
     }
     
     public func setEditorBackgroundColor(_ color: UIColor) {
@@ -492,6 +498,7 @@ open class RichEditorView: UIView, UIScrollViewDelegate, UIWebViewDelegate, UIGe
                 html = contentHTML
                 isContentEditable = editingEnabledVar
                 placeholder = placeholderText
+                fontSize = innerFontSize
                 lineHeight = innerLineHeight
                 delegate?.richEditorDidLoad?(self)
             }
